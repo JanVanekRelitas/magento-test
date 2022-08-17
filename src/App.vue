@@ -5,54 +5,51 @@
   <p v-if="loading">
     Loading...
   </p>
-  <p
-    v-for="character in result.data.results"
+  <div
     v-else
-    :key="character.id"
   >
-    {{ character.name }}
-  </p>
-  <div />
+    <router-link
+      v-for="category in result.categoryList[0].children"
+      :key="category.uid"
+      :to="category.url_path"
+    >
+      <button>{{ category.name }}</button>
+    </router-link>
+  </div>
 </template>
 
-<script>
+<script setup>
 import gql from 'graphql-tag'
 import { useQuery } from '@vue/apollo-composable'
 
 const CHARACTERS_QUERY = gql`
 query {
-  categories {
-    total_count
-    items {
+  categoryList {
+    children_count
+    children {
+      uid
+      level
+      name
+      path
+      url_path
+      url_key
       children {
         uid
         level
         name
         path
-        children_count
-        children {
-          uid
-          level
-          name
-          path
-        }
+        url_path
+        url_key
       }
     }
   }
 }
 `
 
-export default {
-  name: 'App',
-  setup () {
+
+
     const { result, loading, error } = useQuery(CHARACTERS_QUERY);
-    return {
-      result,
-      loading, 
-      error
-    }
-  }
-}
+
 
 </script>
 

@@ -1,26 +1,26 @@
 import { createApp, provide, h } from 'vue'
-import { DefaultApolloClient } from '@vue/apollo-composable'
-import { ApolloClient,createHttpLink, InMemoryCache } from '@apollo/client/core'
 import App from './App.vue'
+import router from './router'
+import { DefaultApolloClient } from '@vue/apollo-composable'
+import { ApolloClient, InMemoryCache } from '@apollo/client/core'
+
+
+
+
 
 const cache = new InMemoryCache()
 
-const httpLink = createHttpLink({
-    // You should use an absolute URL here
-    uri: 'https://venia.magento.com/graphql'
-  })
-
 const apolloClient = new ApolloClient({
   cache,
-  link: httpLink,
+  uri: '/magentoGraphql'
 })
 
 const app = createApp({
   setup () {
     provide(DefaultApolloClient, apolloClient)
   },
-
   render: () => h(App),
 })
 
+app.use(router)
 app.mount('#app');
