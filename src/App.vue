@@ -5,50 +5,49 @@
   <p v-if="loading">
     Loading...
   </p>
-  <div
-    v-else
-  >
-    <router-link
-      v-for="category in result.categoryList[0].children"
-      :key="category.uid"
-      :to="category.url_path"
-    >
-      <button>{{ category.name }}</button>
-    </router-link>
-  </div>
+  <template v-else>
+    <div>
+      <router-link
+        v-for="mainCategory in categoryList"
+        :key="mainCategory.uid"
+        :to="{ name: 'categoryList', params: { mainUrlKey: mainCategory.url_key, categoryUID: mainCategory.uid }}"
+      >
+        <button>{{ mainCategory.name }}</button>
+      </router-link>
+    </div>
+    <div v-if="selectedMainCategory">
+      <div v-if="selectedMainCategory.children.length">
+        <router-link
+          v-for="selectedChildCategory in selectedMainCategory.children"
+        
+          :key="selectedChildCategory.uid"
+          :to="{ name: 'categoryList', params: { mainUrlKey: selectedMainCategory.url_key,childUrlKey:selectedChildCategory.url_key, categoryUID: selectedChildCategory.uid }}"
+        >
+          <button>{{ selectedChildCategory.name }}</button>
+        </router-link>
+      </div>
+      <div>
+        {{ selectedMainCategory.name }}
+      </div>
+    </div>
+    <router-view />
+  </template>
 </template>
 
 <script setup>
-import gql from 'graphql-tag'
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import { useQuery } from '@vue/apollo-composable'
 
-const CHARACTERS_QUERY = gql`
-query {
-  categoryList {
-    children_count
-    children {
-      uid
-      level
-      name
-      path
-      url_path
-      url_key
-      children {
-        uid
-        level
-        name
-        path
-        url_path
-        url_key
-      }
-    }
-  }
-}
-`
+import { CATEGORY_LIST_QUERY } from './graphql'
 
+const route = useRoute()
 
+const { result, loading, error } = useQuery(CATEGORY_LIST_QUERY);
+const categoryList = computed(() => result && result.value.categoryList.length && result.value.categoryList[0].children || [])
+const selectedMainCategory = computed(() => categoryList.value.find((categoryToFind => categoryToFind.url_key === route.params.mainUrlKey)))
 
-    const { result, loading, error } = useQuery(CHARACTERS_QUERY);
+    
 
 
 </script>
