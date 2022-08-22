@@ -24,17 +24,45 @@ query GetCategoryList {
 }
 `
 export const PRODUCTS_IN_CATEGORY_QUERY = gql`
-query GetProductsInCategory($categoryUID: [String]) {
+query GetProductsInCategory($categoryUid: [String]) {
     products(
         filter: {
-            category_uid: {in: $categoryUID}
+            category_uid: {in: $categoryUid}
         }
         ) {
         items {
             name
-            sku
+            url_key
             small_image{
                 url
+                label
+            }
+            price_range {
+            minimum_price {
+                regular_price {
+                value
+                currency
+                }
+            }
+            }
+        }
+    }
+}
+`
+
+export const PRODUCT_DETAIL = gql`
+query GetProductDetail($productUrlKey: [String]) {
+    products(
+        filter: {
+            url_key: {in: $productUrlKey}
+        }
+        ) {
+        items {
+            name
+            url_key
+            small_image{
+                url
+                label
             }
             price_range {
             minimum_price {
